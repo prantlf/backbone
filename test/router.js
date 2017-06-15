@@ -2,8 +2,13 @@
 
   var router = null;
   var location = null;
+  var lastFragment = null;
   var lastRoute = null;
   var lastArgs = [];
+
+  var onNavigate = function(history, fragment) {
+    lastFragment = fragment;
+  };
 
   var onRoute = function(routerParam, route, args) {
     lastRoute = route;
@@ -51,11 +56,13 @@
       lastRoute = null;
       lastArgs = [];
       Backbone.history.on('route', onRoute);
+      Backbone.history.on('navigate', onNavigate);
     },
 
     teardown: function() {
       Backbone.history.stop();
       Backbone.history.off('route', onRoute);
+      Backbone.history.off('navigate', onNavigate);
     }
 
   });
@@ -254,6 +261,13 @@
     Backbone.history.navigate('route');
     Backbone.history.navigate('/route');
     Backbone.history.navigate('/route');
+  });
+
+  QUnit.test('when routing, triggers events on the history object', function(assert) {
+    assert.expect(2);
+    assert.notEqual(lastFragment, 'events');
+    Backbone.history.navigate('events');
+    assert.equal(lastFragment, 'events');
   });
 
   QUnit.test('use implicit callback if none provided', function(assert) {
