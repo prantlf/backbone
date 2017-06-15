@@ -1850,6 +1850,7 @@
       } else {
         return this.location.assign(url);
       }
+      this.trigger('navigate', this, fragment);
       if (options.trigger) return this.loadUrl(fragment);
     },
 
