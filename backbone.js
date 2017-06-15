@@ -754,6 +754,7 @@
   // its models in sort order, as they're added and removed.
   var Collection = Backbone.Collection = function(models, options) {
     options || (options = {});
+    this.cid = _.uniqueId(this.cidPrefix);
     if (options.model) this.model = options.model;
     if (options.comparator !== void 0) this.comparator = options.comparator;
     this._reset();
@@ -782,6 +783,10 @@
     // The default model for a collection is just a **Backbone.Model**.
     // This should be overridden in most cases.
     model: Model,
+
+    // The prefix is used to create the client id which is used to identify collections locally.
+    // You may want to override this if you want to make the name consistent with your models.
+    cidPrefix: 'a',
 
     // Initialize is an empty function by default. Override it with your own
     // initialization logic.

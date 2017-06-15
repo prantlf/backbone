@@ -661,6 +661,19 @@
     assert.equal(coll.one, 1);
   });
 
+  QUnit.test('setting an alternative cid prefix', function(assert) {
+    assert.expect(2);
+    var Collection = Backbone.Collection.extend({
+      cidPrefix: 'c'
+    });
+    var coll = new Collection();
+
+    assert.equal(coll.cid.charAt(0), 'c');
+
+    coll = new Backbone.Collection();
+    assert.equal(coll.cid.charAt(0), 'a');
+  });
+
   QUnit.test('toJSON', function(assert) {
     assert.expect(1);
     assert.equal(JSON.stringify(col), '[{"id":3,"label":"a"},{"id":2,"label":"b"},{"id":1,"label":"c"},{"id":0,"label":"d"}]');
