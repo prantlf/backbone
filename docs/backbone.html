@@ -4781,6 +4781,7 @@ based history, then <code>navigate</code> becomes a page refresh.</p>
             <div class="content"><div class='highlight'><pre>      } <span class="hljs-keyword">else</span> {
         <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.location.assign(url);
       }
+      <span class="hljs-keyword">this</span>.trigger(<span class="hljs-string">'navigate'</span>, <span class="hljs-keyword">this</span>, fragment);
       <span class="hljs-keyword">if</span> (options.trigger) <span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.loadUrl(fragment);
     },</pre></div></div>
             
