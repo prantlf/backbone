@@ -357,6 +357,15 @@
     assert.equal(model.isNew(), true);
   });
 
+  QUnit.test('using a null id attribute.', function(assert) {
+    assert.expect(3);
+    var Model = Backbone.Model.extend({idAttribute: null});
+    var model = new Model({id: 'eye-dee', _id: 25, title: 'Model'});
+    assert.equal(model.get('id'), 'eye-dee');
+    assert.equal(model.id, undefined);
+    assert.equal(model.isNew(), true);
+  });
+
   QUnit.test('setting an alternative cid prefix', function(assert) {
     assert.expect(4);
     var Model = Backbone.Model.extend({

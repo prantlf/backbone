@@ -101,6 +101,23 @@
     assert.equal(collection2.get(model.clone()), collection2.first());
   });
 
+  QUnit.test('get with null ids', function(assert) {
+    assert.expect(6);
+    var Model = Backbone.Model.extend({idAttribute: null});
+    var model1 = new Model({id: 1, _id: 1});
+    var model2 = new Model({id: 1, _id: 2});
+    var model3 = new Model({id: 1, _id: 3});
+    var collection = new Backbone.Collection([model1], {model: Model});
+    assert.equal(collection.at(0).get('_id'), 1);
+    assert.equal(collection.get(model1.cid), model1);
+    collection.add(model2);
+    assert.equal(collection.at(1).get('_id'), 2);
+    assert.equal(collection.get(model2.cid), model2);
+    collection.add(model3.attributes);
+    assert.equal(collection.at(2).get('_id'), 3);
+    assert.equal(collection.get(collection.at(2).cid)._id, model3._id);
+  });
+
   QUnit.test('has', function(assert) {
     assert.expect(15);
     assert.ok(col.has(a));

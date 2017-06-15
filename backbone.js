@@ -1090,7 +1090,10 @@
 
     // Define how to uniquely identify models in the collection.
     modelId: function(attrs) {
-      return attrs[this.model.prototype.idAttribute || 'id'];
+      // If idAttribute is explicitely set to null, the model has
+      // no unique identifier and this method should return null
+      var idAttribute = this.model.prototype.idAttribute;
+      return idAttribute !== null ? attrs[idAttribute || 'id'] : null;
     },
 
     // Private method to reset all internal state. Called when the collection
