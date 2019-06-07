@@ -1,4 +1,4 @@
-(function() {
+(function(QUnit) {
 
   var router = null;
   var location = null;
@@ -33,7 +33,8 @@
         'fragment',
         'pathname',
         'protocol'
-      ));
+     ));
+
       // In IE, anchor.pathname does not contain a leading slash though
       // window.location.pathname does.
       if (!/^\//.test(this.pathname)) this.pathname = '/' + this.pathname;
@@ -47,7 +48,7 @@
 
   QUnit.module('Backbone.Router', {
 
-    setup: function() {
+    beforeEach: function() {
       location = new Location('http://example.com');
       Backbone.history = _.extend(new Backbone.History, {location: location});
       router = new Router({testing: 101});
@@ -59,7 +60,7 @@
       Backbone.history.on('navigate', onNavigate);
     },
 
-    teardown: function() {
+    afterEach: function() {
       Backbone.history.stop();
       Backbone.history.off('route', onRoute);
       Backbone.history.off('navigate', onNavigate);
@@ -102,6 +103,10 @@
       '*anything': 'anything'
     },
 
+    preinitialize: function(options) {
+      this.testpreinit = 'foo';
+    },
+
     initialize: function(options) {
       this.testing = options.testing;
       this.route('implicit', 'implicit');
@@ -128,19 +133,19 @@
       this.charType = 'escaped';
     },
 
-    contacts: function(){
+    contacts: function() {
       this.contact = 'index';
     },
 
-    newContact: function(){
+    newContact: function() {
       this.contact = 'new';
     },
 
-    loadContact: function(){
+    loadContact: function() {
       this.contact = 'load';
     },
 
-    optionalItem: function(arg){
+    optionalItem: function(arg) {
       this.arg = arg !== void 0 ? arg : null;
     },
 
@@ -186,6 +191,11 @@
   QUnit.test('initialize', function(assert) {
     assert.expect(1);
     assert.equal(router.testing, 101);
+  });
+
+  QUnit.test('preinitialize', function(assert) {
+    assert.expect(1);
+    assert.equal(router.testpreinit, 'foo');
   });
 
   QUnit.test('routes (simple)', function(assert) {
@@ -241,10 +251,11 @@
     assert.ok(Backbone.history.navigate('search/manhattan/p20', true));
   });
 
-  QUnit.test('route precedence via navigate', function(assert){
+  QUnit.test('route precedence via navigate', function(assert) {
     assert.expect(6);
-    // check both 0.9.x and backwards-compatibility options
-    _.each([{trigger: true}, true], function( options ){
+
+    // Check both 0.9.x and backwards-compatibility options
+    _.each([{trigger: true}, true], function(options) {
       Backbone.history.navigate('contacts', options);
       assert.equal(router.contact, 'index');
       Backbone.history.navigate('contacts/new', options);
@@ -256,7 +267,7 @@
 
   QUnit.test('loadUrl is not called for identical routes.', function(assert) {
     assert.expect(0);
-    Backbone.history.loadUrl = function(){ assert.ok(false); };
+    Backbone.history.loadUrl = function() { assert.ok(false); };
     location.replace('http://example.com#route');
     Backbone.history.navigate('route');
     Backbone.history.navigate('/route');
@@ -359,9 +370,9 @@
     assert.strictEqual(router.path, 'c/d/e');
   });
 
-  QUnit.test("fires event when router doesn't have callback on it", function(assert) {
+  QUnit.test('fires event when router doesn\'t have callback on it', function(assert) {
     assert.expect(1);
-    router.on('route:noCallback', function(){ assert.ok(true); });
+    router.on('route:noCallback', function() { assert.ok(true); });
     location.replace('http://example.com#noCallback');
     Backbone.history.checkUrl();
   });
@@ -550,8 +561,8 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(){},
-        replaceState: function(){}
+        pushState: function() {},
+        replaceState: function() {}
       }
     });
     Backbone.history.start({root: 'root'});
@@ -565,8 +576,8 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(){},
-        replaceState: function(state, title, url){
+        pushState: function() {},
+        replaceState: function(state, title, url) {
           assert.strictEqual(url, '/root/x/y');
         }
       }
@@ -584,8 +595,8 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(){},
-        replaceState: function(){}
+        pushState: function() {},
+        replaceState: function() {}
       }
     });
     Backbone.history.start({root: ''});
@@ -639,8 +650,8 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(){},
-        replaceState: function(state, title, url){
+        pushState: function() {},
+        replaceState: function(state, title, url) {
           assert.strictEqual(url, '/root/x/y?a=b');
         }
       }
@@ -655,8 +666,8 @@
     assert.expect(1);
     var MyRouter = Backbone.Router.extend({
       routes: {'': 'empty'},
-      empty: function(){},
-      route: function(route){
+      empty: function() {},
+      route: function(route) {
         assert.strictEqual(route, '');
       }
     });
@@ -669,7 +680,8 @@
     assert.strictEqual(history.getFragment('fragment   '), 'fragment');
   });
 
-  QUnit.test('#1820 - Leading slash and trailing space.', 1, function(assert) {
+  QUnit.test('#1820 - Leading slash and trailing space.', function(assert) {
+    assert.expect(1);
     var history = new Backbone.History;
     assert.strictEqual(history.getFragment('/fragment '), 'fragment');
   });
@@ -684,7 +696,7 @@
     assert.strictEqual(router.z, '123');
   });
 
-  QUnit.test("#2062 - Trigger 'route' event on router instance.", function(assert) {
+  QUnit.test('#2062 - Trigger "route" event on router instance.', function(assert) {
     assert.expect(2);
     router.on('route', function(name, args) {
       assert.strictEqual(name, 'routeEvent');
@@ -723,8 +735,8 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(){},
-        replaceState: function(){ assert.ok(false); }
+        pushState: function() {},
+        replaceState: function() { assert.ok(false); }
       }
     });
     Backbone.history.start({
@@ -740,8 +752,8 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(){},
-        replaceState: function(){}
+        pushState: function() {},
+        replaceState: function() {}
       }
     });
 
@@ -767,7 +779,7 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(state, title, url){
+        pushState: function(state, title, url) {
           assert.strictEqual(url, '/root');
         }
       }
@@ -799,7 +811,7 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(state, title, url){
+        pushState: function(state, title, url) {
           assert.strictEqual(url, '/root?x=1');
         }
       }
@@ -837,7 +849,7 @@
     assert.expect(1);
     var MyRouter = Backbone.Router.extend({
       routes: {
-        path: function(params){
+        path: function(params) {
           assert.strictEqual(params, 'x=y%3Fz');
         }
       }
@@ -935,7 +947,7 @@
     Backbone.history = _.extend(new Backbone.History, {location: location});
     var MyRouter = Backbone.Router.extend({
       routes: {'foo/:id/bar': 'foo'},
-      foo: function(){},
+      foo: function() {},
       execute: function(callback, args, name) {
         assert.strictEqual(callback, this.foo);
         assert.deepEqual(args, ['123', 'x=y']);
@@ -967,8 +979,8 @@
     Backbone.history = _.extend(new Backbone.History, {
       location: location,
       history: {
-        pushState: function(){ assert.ok(false); },
-        replaceState: function(){ assert.ok(false); }
+        pushState: function() { assert.ok(false); },
+        replaceState: function() { assert.ok(false); }
       }
     });
     Backbone.history.start({pushState: true});
@@ -1005,14 +1017,14 @@
     Backbone.history.start({root: '/root', pushState: true});
   });
 
-  QUnit.test("Paths that don't match the root should not match no root", function(assert) {
+  QUnit.test('Paths that don\'t match the root should not match no root', function(assert) {
     assert.expect(0);
     location.replace('http://example.com/foo');
     Backbone.history.stop();
     Backbone.history = _.extend(new Backbone.History, {location: location});
     var MyRouter = Backbone.Router.extend({
       routes: {
-        foo: function(){
+        foo: function() {
           assert.ok(false, 'should not match unless root matches');
         }
       }
@@ -1021,14 +1033,14 @@
     Backbone.history.start({root: 'root', pushState: true});
   });
 
-  QUnit.test("Paths that don't match the root should not match roots of the same length", function(assert) {
+  QUnit.test('Paths that don\'t match the root should not match roots of the same length', function(assert) {
     assert.expect(0);
     location.replace('http://example.com/xxxx/foo');
     Backbone.history.stop();
     Backbone.history = _.extend(new Backbone.History, {location: location});
     var MyRouter = Backbone.Router.extend({
       routes: {
-        foo: function(){
+        foo: function() {
           assert.ok(false, 'should not match unless root matches');
         }
       }
@@ -1043,7 +1055,7 @@
     Backbone.history.stop();
     Backbone.history = _.extend(new Backbone.History, {location: location});
     var MyRouter = Backbone.Router.extend({
-      routes: {foo: function(){ assert.ok(true); }}
+      routes: {foo: function() { assert.ok(true); }}
     });
     var myRouter = new MyRouter;
     Backbone.history.start({root: 'x+y.z', pushState: true});
@@ -1055,7 +1067,7 @@
     Backbone.history.stop();
     Backbone.history = _.extend(new Backbone.History, {location: location});
     var MyRouter = Backbone.Router.extend({
-      routes: {foo: function(){ assert.ok(true); }}
+      routes: {foo: function() { assert.ok(true); }}
     });
     var myRouter = new MyRouter;
     Backbone.history.start({root: '®ooτ', pushState: true});
@@ -1067,10 +1079,17 @@
     Backbone.history.stop();
     Backbone.history = _.extend(new Backbone.History, {location: location});
     var MyRouter = Backbone.Router.extend({
-      routes: {'': function(){ assert.ok(true); }}
+      routes: {'': function() { assert.ok(true); }}
     });
     var myRouter = new MyRouter;
     Backbone.history.start({root: '®ooτ', pushState: true});
   });
 
-})();
+  QUnit.test('#4025 - navigate updates URL hash as is', function(assert) {
+    assert.expect(1);
+    var route = 'search/has%20space';
+    Backbone.history.navigate(route);
+    assert.strictEqual(location.hash, '#' + route);
+  });
+
+})(QUnit);
